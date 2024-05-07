@@ -24,12 +24,12 @@ class Hook {
 	/**
 	 * Hook methods based on annotation.
 	 *
-	 * @param object $object Object or class name.
+	 * @param object|string $object_or_class Object or class name.
 	 *
 	 * @return void
 	 */
-	public static function annotations( object $object ): void {
-		$reflection     = new ReflectionClass( $object );
+	public static function annotations( $object_or_class ): void {
+		$reflection     = new ReflectionClass( $object_or_class );
 		$public_methods = $reflection->getMethods( ReflectionMethod::IS_PUBLIC );
 
 		foreach ( $public_methods as $method ) {
@@ -48,7 +48,7 @@ class Hook {
 			foreach ( $annotations as $annotation ) {
 				add_filter(
 					$annotation['tag'],
-					[ $object, $method->name ],
+					[ $object_or_class, $method->name ],
 					$annotation['priority'],
 					$method->getNumberOfParameters()
 				);
