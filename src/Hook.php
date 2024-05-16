@@ -8,6 +8,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use function add_filter;
 use function explode;
+use function is_string;
 use function preg_match_all;
 use function str_replace;
 use function trim;
@@ -31,11 +32,17 @@ class Hook {
 	public static function annotations( $object_or_class ): void {
 		$reflection     = new ReflectionClass( $object_or_class );
 		$public_methods = $reflection->getMethods( ReflectionMethod::IS_PUBLIC );
+		$is_class_name  = is_string( $object_or_class );
 
 		foreach ( $public_methods as $method ) {
 
 			// Do not hook constructors.
 			if ( $method->isConstructor() ) {
+				continue;
+			}
+
+			// Do not hook non-static methods for non-object classes.
+			if ( $is_class_name && $method->isStatic() ) {
 				continue;
 			}
 
