@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace Blockify\Hooks;
 
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use function add_filter;
 use function explode;
@@ -30,9 +31,13 @@ class Hook {
 	 * @return void
 	 */
 	public static function annotations( $object_or_class ): void {
-		$reflection     = new ReflectionClass( $object_or_class );
+		try {
+			$reflection = new ReflectionClass( $object_or_class );
+		} catch ( ReflectionException $e ) {
+			return;
+		}
+
 		$public_methods = $reflection->getMethods( ReflectionMethod::IS_PUBLIC );
-		$is_class_name  = is_string( $object_or_class );
 
 		foreach ( $public_methods as $method ) {
 
@@ -42,7 +47,7 @@ class Hook {
 			}
 
 			// Do not hook non-static methods for non-object classes.
-			if ( $is_class_name && $method->isStatic() ) {
+			if ( is_string( $object_or_class ) && $method->isStatic() ) {
 				continue;
 			}
 
